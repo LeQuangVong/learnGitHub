@@ -170,3 +170,102 @@ git branch
 
 ## Handle conflicts when merging branches
 Now we merge the ```alpha``` branch into the ```master``` branch because both branches have many commit since the branch time (thời điểm rẽ nhánh), so when merging, git does not automatically create new commit and it pauses so we can processes each (từng) conflicting file and create issue a commit after resolvign all conflicts (xung đột).
+```
+git merge alpha                                                    
+CONFLICT (add/add): Merge conflict in Branch/Readme.md
+Auto-merging Branch/Readme.md
+CONFLICT (add/add): Merge conflict in Branch/1.txt
+Auto-merging Branch/1.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+git status                                                   
+On branch master
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+        new file:   Branch/gitbranch-4307.png
+        new file:   Branch/gitbranch-4308.png
+        new file:   Branch/gitbranch-4309.png
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both added:      Branch/1.txt
+        both added:      Branch/Readme.md
+
+git add .                                                   
+
+git commit -m"C8 - gop nhanh alpha"  
+
+git status                                                   
+On branch master
+nothing to commit, working tree clean
+```
+
+Draw a detailed branch merging diagram:
+```
+git log --oneline --graph
+*   eb2ef70 (HEAD -> master) C8 - gop nhanh alpha
+|\  
+| * 6a48924 (alpha) C4
+| * 06e9842 C3
+* | 7988423 C7
+* | 2815cd4 C6
+* | 67e4edf C5
+|/  
+* d8e1fc6 C2 - Update,Readme.md
+* 81be31a C1 - Sua doi a.txt
+* 126ad7f C0 - Khoi tao du an
+1
+```
+
+![](./gitbranch-4332.png)
+
+We can move the HEAD pointer to the last commit of the ```master``` branch before merging branch (C7) and ```alpha``` branch (C4).
+```
+git checkout 7988423   #7988423 is hash of C7 commit
+git checkout 6a48924   #6a48924 is hash of C4 commit
+```
+## Git rebase
+Create commits in two branches ```beta``` and ```master```
+```
+#beta branch
+git log --oneline
+74ab41d (HEAD -> beta) B2
+086b1b6 B1
+fa1423d C3
+be90521 C2
+f2d3245 C1
+
+#master branch
+git log --oneline
+a621372 (HEAD -> master) D2
+e5176f7 D1
+fa1423d C3
+be90521 C2
+f2d3245 C1
+```
+Proceed to merge the ```beta``` branch into the ```master``` branch, standing at (đứng ở) the ```master``` to excute the command:
+```
+git rebase beta
+* bbb0179 (HEAD -> master) D2
+* c7cc53c D1
+* 367d02d (beta) B2
+* 4b16194 B1
+* fa1423d C3
+* be90521 C2
+* f2d3245 C1
+```
+![](./git012.png)
+
+### Difference between ```git merge``` and ```git rebase```
+```Git merge```:
+- Consider (xem xét) changes on 2 branches at 3 times: the last commit time of the branches and branch time.
+- Commits are arranged in chronological order (thứ tự thời gian).
+
+```Git rebase```:
+- The common commits between two branches are called base commit.
+- Put the entire ```beta``` branch as the master's base, so the next commits after the master's original base commit will be folowed, with changes to the commit history.
+
+**NOTE:** Because rebase will rewrite the commit history on the branch, absolutely (tuyệt đối) do not schedule a rebase when the branch's commit have been pushed to the public Repository, otherwise (nếu không) everything will be messy (rối tung).
